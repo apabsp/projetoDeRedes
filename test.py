@@ -2,16 +2,24 @@ import socket
 
 #https://docs.python.org/3/library/socket.html
 
-mysocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #first parameter specifies IPv4, second parameter specifies TCP
-mysocket.connect(('google.com', 80)) # port
-comando = "GET / HTTP/1.0\r\nHost: www.google.com\r\n\r\n"
+# O cliente deve ser capaz de se conectar ao servidor através do localhost
+#(quando na mesma máquina) ou via IP. A comunicação deve ocorrer via sockets;
 
-mysocket.sendall(comando.encode())  # fix
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #af_net = protocolo iPv4, sock_stream = TCP
+
+server_address = ('localhost', 80) #definição do localhost
+s.connect(server_address) #conexão com o host
+
+comando = "GET / HTTP/1.0\r\nHost: localhost\r\n\r\n"
+s.sendall(comando.encode())  #envia o get pro servidor
 
 while True:
-    data = mysocket.recv(512) 
+    data = s.recv(512) #leitura dos bytes
     if len(data) < 1:
         break
     print(data.decode(), end="")
 
-mysocket.close()
+s.close()
+
+# Um protocolo de aplicação (regras a nível de aplicação) deve ser proposto e
+# descrito (requisições e respostas descritas);
