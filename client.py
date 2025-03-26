@@ -7,10 +7,9 @@ import socket
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #af_net = protocolo iPv4, sock_stream = TCP
 
-server_address = ('localhost', 80) #definição do localhost
+server_address = ('', 80) #definição do localhost
 s.connect(server_address) #conexão com o host
 
-comando = "GET / HTTP/1.0\r\nHost: localhost\r\n\r\n"
 s.sendall(comando.encode())  #envia o get pro servidor
 
 while True:
