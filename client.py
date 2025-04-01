@@ -1,4 +1,5 @@
 import socket
+import time
 
 #https://docs.python.org/3/library/socket.html
 
@@ -7,8 +8,21 @@ import socket
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #af_net = protocolo iPv4, sock_stream = TCP
 
-server_address = ('', 80) #definição do localhost
+server_address = ('localhost', 80) #definição do localhost
 s.connect(server_address) #conexão com o host
+
+#Colocar uma lógica de retry
+retries = 5
+for i in range(retries):
+    try:
+        s.connect(server_address)  # Tenta a conexão
+        break 
+    except ConnectionRefusedError:
+        print(f"Connection failed, retrying ({i + 1}/{retries})...")
+        time.sleep(2)  # Espera 2 segundos antes de tentar novamente
+else:
+    print("Failed to connect after several attempts.")
+    exit(1)
 
 s.sendall(comando.encode())  #envia o get pro servidor
 
