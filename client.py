@@ -1,17 +1,14 @@
 import socket
 import time
 
-#https://docs.python.org/3/library/socket.html
+# Cliente deve se conectar ao servidor via localhost
+comando = input("Selecione tipo de conexão. (GET, POST...) ")
 
-#O cliente deve ser capaz de se conectar ao servidor através do localhost
-#(quando na mesma máquina) ou via IP. A comunicação deve ocorrer via sockets;
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # af_net = protocolo iPv4, sock_stream = TCP
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #af_net = protocolo iPv4, sock_stream = TCP
+server_address = ('localhost', 80)  # Definindo o localhost
 
-server_address = ('localhost', 80) #definição do localhost
-s.connect(server_address) #conexão com o host
-
-#Colocar uma lógica de retry
+# Colocar uma lógica de retry para conexão com host
 retries = 5
 for i in range(retries):
     try:
@@ -24,15 +21,19 @@ else:
     print("Failed to connect after several attempts.")
     exit(1)
 
-s.sendall(comando.encode())  #envia o get pro servidor
+print("Enviando comando:", comando)
+s.sendall((comando+"\n").encode())  # Envia o comando para o servidor com newLine
+print("Comando Enviado.")
 
 while True:
-    data = s.recv(512) #leitura dos bytes
+    
+    data = s.recv(512)  # Aguarda receber dados do servidor (até 512 bytes por vez)
+    #print(f"Recebido: {data}")  # Debug
     if len(data) < 1:
+        print("\n\n\nNenhum dado restando para receber!")
         break
     print(data.decode(), end="")
 
-s.close()
 
-# Um protocolo de aplicação (regras a nível de aplicação) deve ser proposto e
-# descrito (requisições e respostas descritas);
+s.close()
+print("\nConexão encerrada!")
