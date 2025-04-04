@@ -1,47 +1,49 @@
 import socket
+import time
 
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+def processar_mensagem(mensagem, seq_num):
+    print(f"[Servidor] Recebido pacote {seq_num}: '{mensagem}', tamanho {len(mensagem)} caracteres")
+    return f"Mensagem {seq_num} recebida com sucesso!"
 
-server_address = ('localhost', 80)
-server_socket.bind(server_address)
+def servidor():
+    host = 'localhost'
+    port = 8080
 
-server_socket.listen(1)
-print("Socket escuta...")
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((host, port))
+    server_socket.listen(1)
+    print(f"[Servidor] Aguardando conexões em {host}:{port}...")
 
-while True:
-    print("Aguardando conexão")
-    connection, client_address = server_socket.accept()  # O retorno é um par (conn, address)
+    client_socket, client_address = server_socket.accept()
+    print(f"[Servidor] Conexão estabelecida com {client_address}")
+
+    mensagem_completa = ""
+    seq_num = 1
+
+    while True:
+        data = client_socket.recv(3)
+        if not data:
+            break
+        
+        mensagem = data.decode()
+        if mensagem == "FIM":
+            break
+
+        mensagem_completa += mensagem
+        metadados_resposta = processar_mensagem(mensagem, seq_num)
+        
+        client_socket.sendall(metadados_resposta.encode())
+        
+        seq_num += 1
+
+    if(len(mensagem_completa) == 0):
+        print(f"\n[Servidor] Mensagem vazia")
+    else:
+        print(f"\n[Servidor] Mensagem completa recebida: {mensagem_completa}")
     
-    try:
-        print("Conectado a ", client_address)
-        data = connection.recv(512)
-        if data:
-            comando = (data.decode().strip()).upper()
-            print("Comando recebido:", comando)
-            
-            if comando == "GET":
-                resposta = "OK - Dados recebidos com sucesso!\n"
-                print(f"Enviando resposta: {resposta}")
-                connection.sendall(resposta.encode())  # Envia a resposta
+    client_socket.close()
+    server_socket.close()
 
-            elif comando == "POST":
-                resposta = "Comando POST não implementado ainda\n"
-                print(f"Enviando resposta: {resposta}")
-                connection.sendall(resposta.encode())
+if __name__ == "__main__":
+    servidor()
 
-            elif comando == "EXIT":
-                resposta = "200 OK: Conexão encerrada com sucesso.\n"
-                print(f"Enviando resposta: {resposta}")
-                connection.sendall(resposta.encode())
-                break
-
-            else:
-                resposta = "ERRO - Comando não reconhecido\n"
-                print(f"Enviando resposta: {resposta}")
-                connection.sendall(resposta.encode())
-        else:
-            print("Nenhum dado recebido.")
-    except Exception as e:
-        print(f"Algo deu errado: {e}")
-    finally:
-        connection.close()
