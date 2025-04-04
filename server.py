@@ -16,7 +16,7 @@ while True:
         print("Conectado a ", client_address)
         data = connection.recv(512)
         if data:
-            comando = data.decode().strip()
+            comando = (data.decode().strip()).upper()
             print("Comando recebido:", comando)
             
             if comando == "GET":
