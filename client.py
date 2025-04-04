@@ -24,42 +24,43 @@ def cliente():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Protocolo IPv4 e TCP
     s.connect((host, port))
 
+    # Handshake inicial: Cliente envia configurações para o servidor
+    modo_operacao = "Go-Back-N"  # Exemplo de modo de operação
+    tamanho_maximo = 3  # Tamanho máximo de pacote
+    s.sendall(f"{modo_operacao},{tamanho_maximo}".encode())
+    
+    # Espera a confirmação do servidor
+    resposta = s.recv(1024).decode()
+    print(f"[Cliente] Configuração recebida do servidor: {resposta}")
+
+    # Envia a mensagem completa para o servidor
     mensagem_completa = input("Digite a mensagem completa para enviar: ")
     
     pacotes = [mensagem_completa[i:i+3] for i in range(0, len(mensagem_completa), 3)]
     
     seq_num = 1
     for pacote in pacotes:
-        # Envio do pacote com simulação de falha
         while True:
             print(f"[Cliente] Enviando pacote {seq_num}: '{pacote}', tamanho {len(pacote)} caracteres")
             
             pacote_modificado = simular_falhas(pacote, seq_num)
             if pacote_modificado is None:
-                # Simulando a perda de pacote. Espera e tenta novamente.
                 time.sleep(1)  # Espera 1 segundo para simular o atraso de perda
                 continue
 
-            # Envia o pacote para o servidor
             s.sendall(pacote_modificado.encode())
-            
-            # Espera a resposta do servidor
             resposta = s.recv(1024).decode()
             
-            # Se o pacote foi corrompido, o servidor pode perceber isso e enviar um NACK
             if "NACK" in resposta:
-                print(f"[Cliente] Pacote {seq_num} corrompido, tentando novamente...")
+                print(f"[Cliente] Pacote {seq_num} corrompido ou com erro, tentando novamente...")
                 continue  # Tenta novamente o envio desse pacote
 
             print(f"[Cliente] Recebido do servidor: {resposta}")
             break  # Se tudo deu certo, sai do loop e passa para o próximo pacote
         seq_num += 1
 
-    # Envia uma mensagem de fim para finalizar a comunicação
     s.sendall("FIM".encode())
     print("[Cliente] Comunicação finalizada.")
-    
-    # Fecha a conexão
     s.close()
 
 if __name__ == "__main__":

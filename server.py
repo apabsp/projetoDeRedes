@@ -17,11 +17,19 @@ def servidor():
     client_socket, client_address = server_socket.accept()
     print(f"[Servidor] Conexão estabelecida com {client_address}")
 
+    # Handshake inicial: Recebe configurações do cliente
+    configuracao = client_socket.recv(1024).decode()
+    modo_operacao, tamanho_maximo = configuracao.split(',')
+    print(f"[Servidor] Configurações recebidas - Modo: {modo_operacao}, Tamanho máximo de pacote: {tamanho_maximo}")
+
+    # Envia confirmação de recebimento das configurações
+    client_socket.sendall(f"Configurações recebidas com sucesso! Modo: {modo_operacao}, Tamanho máximo: {tamanho_maximo}".encode())
+
     mensagem_completa = ""
     seq_num = 1
 
     while True:
-        data = client_socket.recv(3)
+        data = client_socket.recv(3)  # Recebe pacotes de tamanho máximo 3 caracteres
         if not data:
             break
         
@@ -36,7 +44,7 @@ def servidor():
         
         seq_num += 1
 
-    if(len(mensagem_completa) == 0):
+    if len(mensagem_completa) == 0:
         print(f"\n[Servidor] Mensagem vazia")
     else:
         print(f"\n[Servidor] Mensagem completa recebida: {mensagem_completa}")
@@ -46,4 +54,3 @@ def servidor():
 
 if __name__ == "__main__":
     servidor()
-
