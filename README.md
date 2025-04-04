@@ -2,6 +2,7 @@
 
 # como fazer a conexão
 
-- Acesse o terminal com python -m http.server 80
-- Abra uma aba um google acessando o host com http://localhost:80
-- Execute o programa
+- Navegue até a pasta principal
+- Execute o programa utilizando "python server.py" em um terminal
+- Em outro terminal execute "python client.py"
+- Insira um comando (ex. GET, POST...) e clique enter

@@ -23,10 +23,18 @@ while True:
                 resposta = "OK - Dados recebidos com sucesso!\n"
                 print(f"Enviando resposta: {resposta}")
                 connection.sendall(resposta.encode())  # Envia a resposta
+
             elif comando == "POST":
                 resposta = "Comando POST não implementado ainda\n"
                 print(f"Enviando resposta: {resposta}")
                 connection.sendall(resposta.encode())
+
+            elif comando == "EXIT":
+                resposta = "200 OK: Conexão encerrada com sucesso.\n"
+                print(f"Enviando resposta: {resposta}")
+                connection.sendall(resposta.encode())
+                break
+
             else:
                 resposta = "ERRO - Comando não reconhecido\n"
                 print(f"Enviando resposta: {resposta}")
