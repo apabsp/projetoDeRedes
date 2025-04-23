@@ -33,6 +33,12 @@ def cliente():
     resposta = s.recv(1024).decode()
     print(f"[Cliente] Configuração recebida do servidor: {resposta}")
 
+    simularPerda = input("\nDeve simular a perda de pacotes? (s / n) ")
+    while simularPerda.lower() != "s" and simularPerda.lower() != "n":
+        simularPerda = input("\nInput inválido. Deve simular a perda de pacotes? (s / n) ")
+    simularPerda = True if simularPerda.lower() == "s" else False
+
+
     # Envia a mensagem completa para o servidor
     mensagem_completa = input("Digite a mensagem completa para enviar: ")
     
@@ -43,7 +49,7 @@ def cliente():
         while True:
             print(f"[Cliente] Enviando pacote {seq_num}: '{pacote}', tamanho {len(pacote)} caracteres")
             
-            pacote_modificado = simular_falhas(pacote, seq_num)
+            pacote_modificado = simular_falhas(pacote, seq_num) if simularPerda else pacote # Dependendo se o usuário quer simular falhas.
             if pacote_modificado is None:
                 time.sleep(1)  # Espera 1 segundo para simular o atraso de perda
                 continue
