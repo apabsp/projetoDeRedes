@@ -17,6 +17,12 @@ def simular_falhas(pacote, seq_num):
     
     return pacote
 
+''' Se quiser testar corrompido
+    pacote_corrompido = pacote[::-1]
+    print(f"[Cliente] Pacote {seq_num} corrompido (forçado).")
+    return pacote_corrompido
+'''
+
 def cliente():
     host = 'localhost'
     port = 8080
@@ -54,7 +60,16 @@ def cliente():
                 time.sleep(1)  # Espera 1 segundo para simular o atraso de perda
                 continue
 
+
+            #Aqui simulamos um atraso com random
+            atraso = random.uniform(0.5, 5.0)
+            print(f"[Cliente] Atraso de {atraso:.2f}s antes do envio do pacote {seq_num}")
             s.sendall(pacote_modificado.encode())
+
+            if random.random() < 0.1: # Simular duplicação, deixar o servidor resolver
+                print(f"[Cliente] Enviando pacote {seq_num} novamente (duplicata).")
+                s.sendall(pacote_modificado.encode())
+            
             resposta = s.recv(1024).decode()
             
             if "NACK" in resposta:

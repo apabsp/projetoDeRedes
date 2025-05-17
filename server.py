@@ -3,7 +3,11 @@ import time
 
 def processar_mensagem(mensagem, seq_num):
     print(f"[Servidor] Recebido pacote {seq_num}: '{mensagem}', tamanho {len(mensagem)} caracteres")
-    return f"Mensagem {seq_num} recebida com sucesso!"
+    
+    if mensagem == mensagem[::-1]: # Já que no client estou invertendo pra simular um pacote corrupto, posso fazer isso para simular detecção
+        print(f"[Servidor] Pacote {seq_num} CORROMPIDO! NACK!")
+        return "NACK"
+    return f"ACK: Mensagem {seq_num} recebida com sucesso!"
 
 def servidor():
     host = 'localhost'
