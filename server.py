@@ -6,7 +6,7 @@ def processar_mensagem(mensagem, seq_num):
     
     if mensagem == mensagem[::-1]: # Já que no client estou invertendo pra simular um pacote corrupto, posso fazer isso para simular detecção
         print(f"[Servidor] Pacote {seq_num} CORROMPIDO! NACK!")
-        return "NACK"
+        return "REJECT"
     return f"ACK: Mensagem {seq_num} recebida com sucesso!"
 
 def servidor():
